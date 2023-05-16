@@ -1,16 +1,21 @@
 pipeline {
     agent any
-    
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/stackexpress-meenakshi/jenkins-ec2.git'
             }
         }
-        
-        stage('Deploy Code to EC2 Instance') {
+       
+        stage('Deploy') {
             steps {
-                sh "sudo cp -r  /home/ec2-user/jenkins-ec2/date.php  /var/www/html"
+                sshagent(['ssh-public-key']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no -i /Users/meenakshigowra/downloads/keypairs/jenkins.cer ec2-user@ec2-107-22-129-135.compute-1.amazonaws.com
+
+                        sudo cp -r  /home/ec2-user/jenkins-ec2/date.php  /var/www/html
+                    """
+                }
             }
         }
     }
